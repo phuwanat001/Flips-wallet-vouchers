@@ -1,3 +1,10 @@
+import React from 'react';
+import { Card } from '../components/ui/Card';
+import StatCard from '../components/ui/StatCard';
+import BalanceChart from '../components/dashboard/BalanceChart';
+import AllocationPie from '../components/dashboard/AllocationPie';
+import RevenueBar from '../components/dashboard/RevenueBar';
+import { DollarSign, PieChart, TrendingUp, Layers } from 'lucide-react';
 import { walletBalance, investmentStats } from '../data/mockData';
 
 const Dashboard = () => {
