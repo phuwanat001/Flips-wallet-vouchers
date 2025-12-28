@@ -8,6 +8,7 @@ import {
   voucherCategories,
   voucherFiltersByCategory,
   movies,
+  userInvestments,
 } from "../data/mockDataVoucher";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
@@ -120,58 +121,56 @@ const FilterPill = ({ active, onClick, label, count }) => (
 );
 
 // =============================================
-// Voucher List Card (Redesigned - Grid Style)
+// Voucher List Card (Redesigned - Compact Style like MovieCard)
 // =============================================
 const VoucherListCard = ({ voucher, onRedeem }) => (
-  <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-pointer">
-    {/* Image with overlay */}
-    <div className="relative aspect-video overflow-hidden">
+  <div className="group flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all">
+    {/* Image with overlay - Same aspect as MovieCard */}
+    <div className="relative aspect-[3/4] overflow-hidden">
       <img
         src={voucher.image}
         alt={voucher.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
       {/* Points badge - top left */}
-      <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
-        <span className="font-bold text-primary">
+      <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-lg">
+        <span className="font-bold text-primary text-xs md:text-sm">
           {voucher.pointsRequired.toLocaleString()}
         </span>
-        <span className="text-xs text-gray-500">Flips</span>
+        <span className="text-[10px] md:text-xs text-gray-500">Flips</span>
       </div>
 
       {/* Tier badge - top right */}
       {voucher.tier === "Gold" && (
-        <div className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
-          <Crown className="w-3.5 h-3.5" />
+        <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full flex items-center gap-0.5 shadow-lg">
+          <Crown className="w-3 h-3" />
           Gold
         </div>
       )}
 
       {/* Title on image */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <h3 className="font-bold text-white text-lg line-clamp-2 drop-shadow-lg">
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <h3 className="font-bold text-white text-sm md:text-base line-clamp-2 drop-shadow-lg">
           {voucher.titleTh || voucher.title}
         </h3>
+        <p className="text-white/70 text-xs line-clamp-1 mt-0.5">
+          {voucher.description}
+        </p>
       </div>
     </div>
 
-    {/* Content */}
-    <div className="p-4">
-      <p className="text-sm text-gray-500 line-clamp-2 mb-4 min-h-[40px]">
-        {voucher.description}
-      </p>
-
-      {/* Redeem button - full width */}
+    {/* Redeem button - compact */}
+    <div className="p-2 md:p-3">
       <Button
         fullWidth
+        size="sm"
         onClick={() => onRedeem(voucher)}
-        className="group-hover:bg-primary group-hover:shadow-lg transition-all"
+        className="text-xs md:text-sm"
       >
-        <Gift className="w-4 h-4 mr-2" />
-        แลกของรางวัล
+        <Gift className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+        แลก
       </Button>
     </div>
   </div>
@@ -354,15 +353,28 @@ const Vouchers = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false); // Step 2 confirmation
   const [showQRVoucher, setShowQRVoucher] = useState(null);
 
-  // User balance state (for realistic mock)
-  const [userBalance, setUserBalance] = useState({
-    flipsBalance: userVoucherBalance.flipsBalance,
-    totalEarned: userVoucherBalance.totalEarned,
-    totalSpent: userVoucherBalance.totalSpent,
-  });
+  // Investment token balances (per-category/movie)
+  const [investments, setInvestments] = useState(userInvestments);
 
   // My redeemed vouchers state
   const [redeemedVouchers, setRedeemedVouchers] = useState(myVouchers);
+
+  // Get current active investment based on selection
+  const activeInvestment = useMemo(() => {
+    if (selectedCategory === "movies" && selectedMovie) {
+      return investments.find(
+        (inv) => inv.categoryId === "movies" && inv.movieId === selectedMovie.id
+      );
+    } else if (selectedCategory !== "movies") {
+      return investments.find((inv) => inv.categoryId === selectedCategory);
+    }
+    return null;
+  }, [selectedCategory, selectedMovie, investments]);
+
+  // Calculate total balance across all investments
+  const totalBalance = useMemo(() => {
+    return investments.reduce((sum, inv) => sum + inv.flipsBalance, 0);
+  }, [investments]);
 
   // Get icon for category
   const getCategoryIcon = (catId) => {
@@ -446,18 +458,30 @@ const Vouchers = () => {
 
   // Handle final confirm (Step 2)
   const handleFinalConfirm = () => {
-    // Deduct points
-    setUserBalance((prev) => ({
-      ...prev,
-      flipsBalance: prev.flipsBalance - selectedVoucher.pointsRequired,
-      totalSpent: prev.totalSpent + selectedVoucher.pointsRequired,
-    }));
+    if (!activeInvestment) {
+      toast.error("ไม่พบ Token สำหรับหมวดหมู่นี้");
+      return;
+    }
+
+    // Deduct points from the specific investment
+    setInvestments((prev) =>
+      prev.map((inv) =>
+        inv.id === activeInvestment.id
+          ? {
+              ...inv,
+              flipsBalance: inv.flipsBalance - selectedVoucher.pointsRequired,
+              totalSpent: inv.totalSpent + selectedVoucher.pointsRequired,
+            }
+          : inv
+      )
+    );
 
     // Add to redeemed vouchers
     const newVoucher = {
       id: `my-${Date.now()}`,
       voucherId: selectedVoucher.id,
       movieId: selectedVoucher.movieId,
+      categoryId: selectedVoucher.category,
       title: selectedVoucher.titleTh || selectedVoucher.title,
       titleTh: selectedVoucher.titleTh || selectedVoucher.title,
       description: selectedVoucher.description,
@@ -468,6 +492,7 @@ const Vouchers = () => {
       qrCode: `FLIPS-${selectedVoucher.id.toUpperCase()}-${Date.now()}`,
       image: selectedVoucher.image,
       tier: selectedVoucher.tier,
+      redeemedWithToken: activeInvestment.title, // Track which token was used
     };
     setRedeemedVouchers((prev) => [newVoucher, ...prev]);
 
@@ -475,7 +500,9 @@ const Vouchers = () => {
     toast.success(
       `แลก "${
         selectedVoucher.titleTh || selectedVoucher.title
-      }" สำเร็จ! หัก ${selectedVoucher.pointsRequired.toLocaleString()} Flips`,
+      }" สำเร็จ! หัก ${selectedVoucher.pointsRequired.toLocaleString()} Flips จาก Token ${
+        activeInvestment.title
+      }`,
       {
         icon: "🎉",
         duration: 4000,
@@ -490,35 +517,90 @@ const Vouchers = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* ========== Points Balance Header ========== */}
-      <div className="bg-primary rounded-2xl p-4 md:p-6 text-white shadow-lg">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-white/80 text-sm">คะแนนคงเหลือ</span>
-          <button className="text-white/80 hover:text-white text-xs flex items-center gap-1">
-            ดูประวัติ <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-3xl md:text-4xl font-bold">
-            {userBalance.flipsBalance.toLocaleString()}
-          </span>
-          <span className="text-lg text-white/80">Flips</span>
-        </div>
-        <div className="flex gap-4 text-xs md:text-sm">
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="text-white/70 mb-1">ได้รับทั้งหมด</p>
-            <p className="font-semibold text-green-300">
-              {userBalance.totalEarned.toLocaleString()}
-            </p>
+      {/* ========== Investment Tokens Header ========== */}
+      {!activeInvestment ? (
+        // Show all tokens when no category/movie selected
+        <div className="bg-primary rounded-2xl p-4 md:p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <span className="text-white/80 text-sm">Flips Point</span>
+              <div className="flex items-baseline gap-2 mt-1"></div>
+            </div>
+            <button className="text-white/80 hover:text-white text-xs flex items-center gap-1">
+              ดูทั้งหมด <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="text-white/70 mb-1">ใช้ไปแล้ว</p>
-            <p className="font-semibold text-red-300">
-              {userBalance.totalSpent.toLocaleString()}
-            </p>
+
+          {/* Token Cards Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {investments.map((inv) => (
+              <div
+                key={inv.id}
+                className="bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer transition-all"
+                onClick={() => {
+                  if (inv.categoryId === "movies") {
+                    setSelectedCategory("movies");
+                    const movie = movies.find((m) => m.id === inv.movieId);
+                    if (movie) setSelectedMovie(movie);
+                  } else {
+                    setSelectedCategory(inv.categoryId);
+                    setSelectedMovie(null);
+                  }
+                  setActiveTab("privileges");
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{inv.icon}</span>
+                  <span className="text-xs font-medium text-white/80 line-clamp-1">
+                    {inv.title}
+                  </span>
+                </div>
+                <div className="text-lg font-bold">
+                  {inv.flipsBalance.toLocaleString()}
+                </div>
+                <div className="text-xs text-white/60">Flips</div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      ) : (
+        // Show selected token details
+        <div className="bg-primary rounded-2xl p-4 md:p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{activeInvestment.icon}</span>
+              <div>
+                <span className="text-white/80 text-sm">
+                  Token {activeInvestment.title}
+                </span>
+              </div>
+            </div>
+            <button className="text-white/80 hover:text-white text-xs flex items-center gap-1">
+              ดูประวัติ <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex items-baseline gap-2 mb-4">
+            <span className="text-3xl md:text-4xl font-bold">
+              {activeInvestment.flipsBalance.toLocaleString()}
+            </span>
+            <span className="text-lg text-white/80">Flips</span>
+          </div>
+          <div className="flex gap-4 text-xs md:text-sm">
+            <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
+              <p className="text-white/70 mb-1">ได้รับทั้งหมด</p>
+              <p className="font-semibold text-green-300">
+                {activeInvestment.totalEarned.toLocaleString()}
+              </p>
+            </div>
+            <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
+              <p className="text-white/70 mb-1">ใช้ไปแล้ว</p>
+              <p className="font-semibold text-red-300">
+                {activeInvestment.totalSpent.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========== Partner Icons Grid ========== */}
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -680,7 +762,7 @@ const Vouchers = () => {
                         เรียงจากแต้มมากไปน้อย • {filteredVouchers.length} รายการ
                       </p>
                       {filteredVouchers.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                           {filteredVouchers.map((voucher) => (
                             <VoucherListCard
                               key={voucher.id}
@@ -732,18 +814,20 @@ const Vouchers = () => {
                     )}
                   </div>
                 </div>
-                <div className="p-4 space-y-3">
-                  <p className="text-xs text-gray-500 mb-2">
+                <div className="p-4">
+                  <p className="text-xs text-gray-500 mb-4">
                     เรียงจากแต้มมากไปน้อย
                   </p>
                   {filteredVouchers.length > 0 ? (
-                    filteredVouchers.map((voucher) => (
-                      <VoucherListCard
-                        key={voucher.id}
-                        voucher={voucher}
-                        onRedeem={handleRedeem}
-                      />
-                    ))
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                      {filteredVouchers.map((voucher) => (
+                        <VoucherListCard
+                          key={voucher.id}
+                          voucher={voucher}
+                          onRedeem={handleRedeem}
+                        />
+                      ))}
+                    </div>
                   ) : (
                     <EmptyState
                       icon={Gift}
@@ -837,6 +921,15 @@ const Vouchers = () => {
             </div>
 
             <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+              {/* Token indicator */}
+              {activeInvestment && (
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                  <span>{activeInvestment.icon}</span>
+                  <span>
+                    ใช้ Token: <strong>{activeInvestment.title}</strong>
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-gray-500 text-sm">คะแนนที่ต้องใช้</span>
                 <span className="font-bold text-primary">
@@ -844,9 +937,11 @@ const Vouchers = () => {
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 text-sm">คะแนนคงเหลือ</span>
+                <span className="text-gray-500 text-sm">
+                  คะแนนคงเหลือ ({activeInvestment?.title || "N/A"})
+                </span>
                 <span className="font-medium">
-                  {userBalance.flipsBalance.toLocaleString()} Flips
+                  {(activeInvestment?.flipsBalance || 0).toLocaleString()} Flips
                 </span>
               </div>
               <hr className="border-gray-200" />
@@ -854,13 +949,15 @@ const Vouchers = () => {
                 <span className="text-gray-500 text-sm">คะแนนหลังแลก</span>
                 <span
                   className={`font-bold ${
-                    userBalance.flipsBalance >= selectedVoucher.pointsRequired
+                    (activeInvestment?.flipsBalance || 0) >=
+                    selectedVoucher.pointsRequired
                       ? "text-green-600"
                       : "text-red-500"
                   }`}
                 >
                   {(
-                    userBalance.flipsBalance - selectedVoucher.pointsRequired
+                    (activeInvestment?.flipsBalance || 0) -
+                    selectedVoucher.pointsRequired
                   ).toLocaleString()}{" "}
                   Flips
                 </span>
@@ -878,7 +975,8 @@ const Vouchers = () => {
               <Button
                 fullWidth
                 disabled={
-                  userBalance.flipsBalance < selectedVoucher.pointsRequired
+                  !activeInvestment ||
+                  activeInvestment.flipsBalance < selectedVoucher.pointsRequired
                 }
                 onClick={handleFirstConfirm}
               >

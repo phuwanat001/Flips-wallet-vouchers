@@ -118,8 +118,9 @@ export const marketplaceVouchers = [
     description: "ชื่อของคุณในฐานะ Executive Producer ใน End Credits",
     category: "movies",
     type: "end-credits",
+    deliveryType: "online", // QR/Digital
     tier: "Gold",
-    pointsRequired: 50000,
+    pointsRequired: 25000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&auto=format&fit=crop",
@@ -134,8 +135,9 @@ export const marketplaceVouchers = [
     description: "ดินเนอร์สุดพิเศษกับนักแสดงนำ ภูมิ-บิวกิ้น",
     category: "movies",
     type: "meet-creator",
+    deliveryType: "online", // QR/Booking
     tier: "Gold",
-    pointsRequired: 75000,
+    pointsRequired: 28000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=400&auto=format&fit=crop",
@@ -150,8 +152,9 @@ export const marketplaceVouchers = [
     description: "บัตร VIP รอบปฐมทัศน์พร้อมพรมแดง",
     category: "movies",
     type: "tickets",
+    deliveryType: "online", // QR Ticket
     tier: "Silver",
-    pointsRequired: 15000,
+    pointsRequired: 5000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1585647347384-2593bc35786b?q=80&w=400&auto=format&fit=crop",
@@ -166,13 +169,48 @@ export const marketplaceVouchers = [
     description: "โปสเตอร์พร้อมลายเซ็นนักแสดงนำทั้งหมด",
     category: "movies",
     type: "merchandise",
+    deliveryType: "offline", // Physical Shipping
     tier: "Bronze",
-    pointsRequired: 8000,
+    pointsRequired: 2000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=400&auto=format&fit=crop",
     available: true,
     quantity: 30,
+  },
+  {
+    id: "mv-1-5",
+    movieId: "movie-1",
+    title: "เสื้อยืดขาว อันนอล",
+    titleTh: "เสื้อยืดขาว อันนอล",
+    description: "เสื้อยืดคุณภาพพรีเมียม พร้อมโลโก้ภาพยนตร์ จัดส่งถึงบ้าน",
+    category: "movies",
+    type: "merchandise",
+    deliveryType: "offline",
+    tier: "Bronze",
+    pointsRequired: 1500,
+    currency: "Flips",
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400&auto=format&fit=crop",
+    available: true,
+    quantity: 50,
+  },
+  {
+    id: "mv-1-6",
+    movieId: "movie-1",
+    title: "แก้วน้ำสะสม Limited Edition",
+    titleTh: "แก้วน้ำสะสม Limited Edition",
+    description: "แก้วน้ำสุดพิเศษ ออกแบบเฉพาะ จำกัดจำนวน",
+    category: "movies",
+    type: "merchandise",
+    deliveryType: "offline",
+    tier: "Silver",
+    pointsRequired: 3500,
+    currency: "Flips",
+    image:
+      "https://images.unsplash.com/photo-1534056526-306-8e315-3e8c?q=80&w=400&auto=format&fit=crop",
+    available: true,
+    quantity: 20,
   },
   // Movie 2: ธี่หยด
   {
@@ -184,7 +222,7 @@ export const marketplaceVouchers = [
     category: "movies",
     type: "end-credits",
     tier: "Gold",
-    pointsRequired: 35000,
+    pointsRequired: 15000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=400&auto=format&fit=crop",
@@ -200,7 +238,7 @@ export const marketplaceVouchers = [
     category: "movies",
     type: "meet-creator",
     tier: "Gold",
-    pointsRequired: 45000,
+    pointsRequired: 20000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=400&auto=format&fit=crop",
@@ -216,7 +254,7 @@ export const marketplaceVouchers = [
     category: "movies",
     type: "tickets",
     tier: "Gold",
-    pointsRequired: 20000,
+    pointsRequired: 8000,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=400&auto=format&fit=crop",
@@ -232,7 +270,7 @@ export const marketplaceVouchers = [
     category: "movies",
     type: "merchandise",
     tier: "Bronze",
-    pointsRequired: 5000,
+    pointsRequired: 1500,
     currency: "Flips",
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400&auto=format&fit=crop",
@@ -361,6 +399,7 @@ export const marketplaceVouchers = [
     description: "VIP access to Ctrl G gaming booth with premium setup",
     category: "ctrl-g",
     type: "tickets",
+    deliveryType: "online",
     tier: "Gold",
     pointsRequired: 15000,
     currency: "Flips",
@@ -395,6 +434,7 @@ export const marketplaceVouchers = [
     description: "Premium gaming gear from Ctrl G partner brands",
     category: "ctrl-g",
     type: "merchandise",
+    deliveryType: "offline",
     tier: "Silver",
     pointsRequired: 12000,
     currency: "Flips",
@@ -412,6 +452,7 @@ export const marketplaceVouchers = [
     description: "Exclusive meet & greet with professional esports players",
     category: "ctrl-g",
     type: "meet-creator",
+    deliveryType: "online",
     tier: "Gold",
     pointsRequired: 35000,
     currency: "Flips",
@@ -464,6 +505,7 @@ export const marketplaceVouchers = [
     description: "Exclusive dinner experience on the yacht with captain",
     category: "yarth",
     type: "meet-creator",
+    deliveryType: "online",
     tier: "Gold",
     pointsRequired: 60000,
     currency: "Flips",
@@ -481,6 +523,7 @@ export const marketplaceVouchers = [
     description: "Exclusive Yarth branded merchandise package",
     category: "yarth",
     type: "merchandise",
+    deliveryType: "offline",
     tier: "Silver",
     pointsRequired: 10000,
     currency: "Flips",
@@ -547,9 +590,61 @@ export const myOrders = [
   },
 ];
 
-// User points balance
+// User's investments with per-category token balances
+export const userInvestments = [
+  {
+    id: "inv-1",
+    categoryId: "movies",
+    movieId: "movie-2", // ธี่หยด
+    title: "ธี่หยด",
+    titleEn: "Home for Rent",
+    icon: "🎬",
+    flipsBalance: 30000,
+    totalEarned: 30000,
+    totalSpent: 0,
+    investedAt: "2024-12-01",
+  },
+  {
+    id: "inv-2",
+    categoryId: "movies",
+    movieId: "movie-1", // หลานม่า
+    title: "หลานม่า",
+    titleEn: "How to Make Millions Before Grandma Dies",
+    icon: "🎬",
+    flipsBalance: 30000,
+    totalEarned: 32000,
+    totalSpent: 2000,
+    investedAt: "2024-11-15",
+  },
+  {
+    id: "inv-3",
+    categoryId: "ctrl-g",
+    movieId: null,
+    title: "Ctrl G",
+    titleEn: "Gaming",
+    icon: "🎮",
+    flipsBalance: 30000,
+    totalEarned: 30000,
+    totalSpent: 0,
+    investedAt: "2024-10-20",
+  },
+  {
+    id: "inv-4",
+    categoryId: "yarth",
+    movieId: null,
+    title: "Yarth",
+    titleEn: "Yacht",
+    icon: "⛵",
+    flipsBalance: 30000,
+    totalEarned: 30000,
+    totalSpent: 0,
+    investedAt: "2024-09-10",
+  },
+];
+
+// Legacy: User points balance (sum of all investments)
 export const userVoucherBalance = {
-  flipsBalance: 50000,
-  totalEarned: 50000,
-  totalSpent: 0,
+  flipsBalance: 120000, // Sum: 30000 x 4
+  totalEarned: 122000,
+  totalSpent: 2000,
 };

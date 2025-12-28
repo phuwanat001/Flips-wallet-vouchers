@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Bell, Search, Menu, X, User } from "lucide-react";
+import { Menu, Search, Bell, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { userProfile } from "../../data/mockData";
-import Notifications from "../ui/Notifications";
+import { useNotifications } from "../../context/NotificationContext";
+import NotificationPanel from "../NotificationPanel";
 
 const Header = ({ onMenuClick }) => {
   const location = useLocation();
+  const { unreadCount } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
@@ -81,11 +83,16 @@ const Header = ({ onMenuClick }) => {
               className="p-2 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors relative"
             >
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </button>
-            {showNotifications && (
-              <Notifications onClose={() => setShowNotifications(false)} />
-            )}
+            <NotificationPanel
+              isOpen={showNotifications}
+              onClose={() => setShowNotifications(false)}
+            />
           </div>
 
           {/* User Avatar - Mobile Only */}

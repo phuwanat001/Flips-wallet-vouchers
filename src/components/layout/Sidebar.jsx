@@ -2,22 +2,27 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  Wallet,
-  User,
-  Shield,
+  Home,
+  TrendingUp,
+  ShoppingBag,
+  Ticket,
   Settings,
+  Shield,
+  Monitor,
+  User,
+  Wallet,
   Menu,
   LogOut,
-  Gift,
 } from "lucide-react";
 import FlipsBrand from "../ui/FlipsBrand";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const navItems = [
     { icon: User, label: "Profile", path: "/" },
-    { icon: Wallet, label: "Wallet/Bank", path: "/wallet" },
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-    { icon: Gift, label: "Vouchers", path: "/vouchers" },
+    { icon: ShoppingBag, label: "Marketplace", path: "/voucher-marketplace" },
+    { icon: Ticket, label: "My Vouchers", path: "/assets-voucher" },
+    { icon: Wallet, label: "Buy Points", path: "/buy-points" },
     { icon: Shield, label: "Security", path: "/security" },
     { icon: Settings, label: "System", path: "/system" },
   ];
